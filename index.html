@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>New Tab | Spatial</title>
+  
+  <!-- Bootstrap Icons -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  
+  <!-- Google Fonts: Inter and Outfit -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+  
+  <!-- Vanta JS and Three JS -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
+  <!-- Using WAVES for a fluid, deep Mac-style background -->
+  <script src="https://cdn.jsdelivr.net/npm/vanta@latest/dist/vanta.waves.min.js"></script>
+  
+  <!-- Spatial Custom CSS -->
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Dynamic Fluid Background -->
+  <div id="vanta-bg" class="fluid-canvas"></div>
+
+  <!-- Left Interaction Pill (Sidebar equivalent) -->
+  <nav class="spatial-nav-pill glass-heavy">
+     <button class="nav-btn" title="Sys.History" id="history-btn">
+        <i class="bi bi-clock-history"></i>
+     </button>
+     <button class="nav-btn" title="Sys.Bookmarks" id="bookmarks-btn">
+        <i class="bi bi-bookmark"></i>
+     </button>
+     <button class="nav-btn" title="Sys.Apps" id="apps-btn">
+        <i class="bi bi-grid"></i>
+     </button>
+     <button class="nav-btn mt-auto" title="Settings" id="settings-btn">
+        <i class="bi bi-sliders"></i>
+     </button>
+  </nav>
+
+  <!-- Center Stage -->
+  <main class="center-stage">
+      <!-- Huge Clock -->
+      <div class="clock-stage">
+          <h1 id="live-clock" class="time-display">00:00</h1>
+          <span id="live-ampm" class="time-ampm">AM</span>
+      </div>
+      
+      <div class="greeting-stage mb-5">
+          <h2 id="greeting-text" class="greeting-text">Welcome.</h2>
+      </div>
+
+      <!-- Morphing Search Bar with Custom Engine Dropdown -->
+      <div class="search-stage glass-heavy">
+          <!-- Custom Dropdown Container -->
+          <div class="custom-engine-select" id="engine-dropdown-toggle">
+              <img id="current-engine-icon" src="https://s2.googleusercontent.com/s2/favicons?domain_url=https://google.com&sz=64" alt="Google">
+              <i class="bi bi-chevron-down ms-2 small text-muted"></i>
+          </div>
+          
+          <!-- Dropdown Options Box -->
+          <div class="engine-options-box glass-heavy" id="engine-options-box">
+              <button class="engine-option" data-value="google">
+                 <img src="https://s2.googleusercontent.com/s2/favicons?domain_url=https://google.com&sz=64" alt="Google"><span>Google</span>
+              </button>
+              <button class="engine-option" data-value="bing">
+                 <img src="https://s2.googleusercontent.com/s2/favicons?domain_url=https://bing.com&sz=64" alt="Bing"><span>Bing</span>
+              </button>
+              <button class="engine-option" data-value="duckduckgo">
+                 <img src="https://s2.googleusercontent.com/s2/favicons?domain_url=https://duckduckgo.com&sz=64" alt="DuckDuckGo"><span>DuckDuckGo</span>
+              </button>
+              <button class="engine-option" data-value="yahoo">
+                 <img src="https://s2.googleusercontent.com/s2/favicons?domain_url=https://yahoo.com&sz=64" alt="Yahoo"><span>Yahoo</span>
+              </button>
+          </div>
+
+          <div class="search-divider"></div>
+          <i class="bi bi-search ms-3 search-accent"></i>
+          <input type="text" id="main-search" class="spatial-input" placeholder="Search the web..." autofocus>
+      </div>
+  </main>
+
+  <!-- Bottom Speed Dial Dock -->
+  <div class="spatial-dock glass-heavy" id="speed-dial-dock">
+      <!-- Quick Dials Injected via JS -->
+  </div>
+
+
+  <!-- Modals -->
+
+  <!-- History Modal -->
+  <div class="spatial-modal" id="modal-history">
+      <div class="spatial-sheet glass-heavy">
+          <div class="sheet-header">
+              <h3 class="sheet-title"><i class="bi bi-clock-history"></i> History</h3>
+              <button class="sheet-close"><i class="bi bi-x"></i></button>
+          </div>
+          <ul class="data-list scroll-hidden" id="history-list">
+              <!-- JS Injected -->
+          </ul>
+      </div>
+  </div>
+
+  <!-- Bookmarks Modal -->
+  <div class="spatial-modal" id="modal-bookmarks">
+      <div class="spatial-sheet glass-heavy">
+          <div class="sheet-header">
+              <h3 class="sheet-title"><i class="bi bi-bookmark"></i> Bookmarks</h3>
+              <button class="sheet-close"><i class="bi bi-x"></i></button>
+          </div>
+          <ul class="data-list scroll-hidden" id="bookmarks-list">
+              <!-- JS Injected -->
+          </ul>
+      </div>
+  </div>
+
+  <!-- Apps Modal -->
+  <div class="spatial-modal" id="modal-apps">
+      <div class="spatial-sheet glass-heavy apps-sheet">
+          <div class="sheet-header">
+              <h3 class="sheet-title"><i class="bi bi-grid"></i> Workspace</h3>
+              <button class="sheet-close"><i class="bi bi-x"></i></button>
+          </div>
+          <div class="apps-spatial-grid scroll-hidden">
+              <a href="https://mail.google.com" class="spatial-app"><img src="https://s2.googleusercontent.com/s2/favicons?domain_url=https://mail.google.com&sz=64"><span>Gmail</span></a>
+              <a href="https://drive.google.com" class="spatial-app"><img src="https://s2.googleusercontent.com/s2/favicons?domain_url=https://drive.google.com&sz=64"><span>Drive</span></a>
+              <a href="https://calendar.google.com" class="spatial-app"><img src="https://s2.googleusercontent.com/s2/favicons?domain_url=https://calendar.google.com&sz=64"><span>Calendar</span></a>
+              <a href="https://photos.google.com" class="spatial-app"><img src="https://s2.googleusercontent.com/s2/favicons?domain_url=https://photos.google.com&sz=64"><span>Photos</span></a>
+              <a href="https://docs.google.com" class="spatial-app"><img src="https://s2.googleusercontent.com/s2/favicons?domain_url=https://docs.google.com&sz=64"><span>Docs</span></a>
+              <a href="https://sheets.google.com" class="spatial-app"><img src="https://s2.googleusercontent.com/s2/favicons?domain_url=https://sheets.google.com&sz=64"><span>Sheets</span></a>
+              
+              <!-- Additional Google Apps -->
+              <a href="https://meet.google.com" class="spatial-app"><img src="https://s2.googleusercontent.com/s2/favicons?domain_url=https://meet.google.com&sz=64"><span>Meet</span></a>
+              <a href="https://keep.google.com" class="spatial-app"><img src="https://s2.googleusercontent.com/s2/favicons?domain_url=https://keep.google.com&sz=64"><span>Keep</span></a>
+              <a href="https://play.google.com" class="spatial-app"><img src="https://s2.googleusercontent.com/s2/favicons?domain_url=https://play.google.com&sz=64"><span>Play Store</span></a>
+              <a href="https://maps.google.com" class="spatial-app"><img src="https://s2.googleusercontent.com/s2/favicons?domain_url=https://maps.google.com&sz=64"><span>Maps</span></a>
+              <a href="https://translate.google.com" class="spatial-app"><img src="https://s2.googleusercontent.com/s2/favicons?domain_url=https://translate.google.com&sz=64"><span>Translate</span></a>
+              <a href="https://news.google.com" class="spatial-app"><img src="https://s2.googleusercontent.com/s2/favicons?domain_url=https://news.google.com&sz=64"><span>News</span></a>
+          </div>
+      </div>
+  </div>
+
+  <!-- Settings Modal (Dock Configuration Only Now) -->
+  <div class="spatial-modal" id="modal-settings">
+      <div class="spatial-sheet glass-heavy settings-sheet">
+          <div class="sheet-header">
+              <h3 class="sheet-title"><i class="bi bi-sliders"></i> System Config</h3>
+              <button class="sheet-close"><i class="bi bi-x"></i></button>
+          </div>
+          
+          <div class="settings-body scroll-hidden">
+              <h4 class="settings-label mt-0">Manage Dock Dials</h4>
+              <div class="flex-row">
+                  <input type="text" id="dial-name" class="spatial-input w-40" placeholder="Name">
+                  <input type="url" id="dial-url" class="spatial-input w-60" placeholder="URL (https://)">
+                  <button class="spatial-btn" id="add-dial-btn"><i class="bi bi-plus-lg"></i></button>
+              </div>
+              <ul class="dials-list mt-3" id="settings-dial-list"></ul>
+          </div>
+      </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>

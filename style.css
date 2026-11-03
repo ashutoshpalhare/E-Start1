@@ -1,0 +1,472 @@
+:root {
+    /* Spatial Colors */
+    --base-text: rgba(255, 255, 255, 0.95);
+    --muted-text: rgba(255, 255, 255, 0.5);
+    --accent-color: #5ea8ff; /* Soft blue */
+    
+    /* Glass Properties */
+    --glass-bg: rgba(20, 25, 45, 0.4);
+    --glass-bg-hover: rgba(40, 50, 80, 0.5);
+    --glass-border: rgba(255, 255, 255, 0.1);
+    --glass-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+    
+    font-size: 16px;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    color: var(--base-text);
+    background-color: #050510;
+    min-height: 100vh;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Base Fluid Canvas */
+.fluid-canvas {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100vw; height: 100vh;
+    z-index: 0;
+    pointer-events: none;
+}
+
+/* Glass Heavy Utility */
+.glass-heavy {
+    background: var(--glass-bg);
+    backdrop-filter: blur(40px) saturate(120%);
+    -webkit-backdrop-filter: blur(40px) saturate(120%);
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--glass-shadow);
+    border-radius: 24px;
+    z-index: 10;
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* 1. Left Nav Pill */
+.spatial-nav-pill {
+    position: fixed;
+    left: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    padding: 15px 10px;
+    border-radius: 40px;
+}
+
+.nav-btn {
+    background: transparent;
+    border: none;
+    color: var(--base-text);
+    font-size: 1.4rem;
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.nav-btn:hover {
+    background: rgba(255,255,255,0.1);
+    transform: scale(1.15);
+}
+
+.mt-auto { margin-top: auto; }
+
+/* 2. Center Stage */
+.center-stage {
+    position: relative;
+    z-index: 5;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    transform: translateY(-5vh);
+}
+
+.clock-stage {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    margin-bottom: -15px;
+}
+
+.time-display {
+    font-family: 'Outfit', sans-serif;
+    font-size: 8rem;
+    font-weight: 700;
+    letter-spacing: -3px;
+    line-height: 1;
+    background: linear-gradient(180deg, #fff 0%, rgba(255,255,255,0.6) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.time-ampm {
+    font-size: 1.5rem;
+    font-weight: 500;
+    color: var(--muted-text);
+}
+
+.greeting-text {
+    font-size: 1.5rem;
+    font-weight: 400;
+    color: var(--muted-text);
+}
+
+/* Morphing Search Bar */
+.search-stage {
+    position: relative;
+    display: flex;
+    align-items: center;
+    width: 650px;
+    max-width: 90vw;
+    height: 65px;
+    border-radius: 40px;
+    padding: 0 15px 0 10px;
+}
+
+.search-stage:focus-within {
+    transform: scale(1.02);
+    box-shadow: 0 15px 50px rgba(0,0,0,0.4), 0 0 0 2px var(--accent-color);
+}
+
+/* Custom Engine Select Dropdown */
+.custom-engine-select {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    padding: 8px 12px;
+    border-radius: 20px;
+    transition: background 0.2s;
+}
+.custom-engine-select:hover { background: rgba(255,255,255,0.1); }
+.custom-engine-select img { width: 22px; height: 22px; border-radius: 50%; }
+
+.engine-options-box {
+    position: absolute;
+    top: 75px; 
+    left: 0;
+    width: 200px;
+    display: none;
+    flex-direction: column;
+    padding: 12px;
+    gap: 6px;
+    transform: translateY(-10px);
+    opacity: 0;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.engine-options-box.active { 
+    display: flex;
+    transform: translateY(0);
+    opacity: 1;
+}
+
+.engine-option {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: transparent;
+    border: none;
+    color: var(--base-text);
+    padding: 10px 14px;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.2s;
+    font-size: 0.95rem;
+    font-family: inherit;
+    text-align: left;
+}
+.engine-option:hover { 
+    background: rgba(255,255,255,0.1); 
+    transform: translateX(5px);
+}
+.engine-option img { width: 24px; height: 24px; border-radius: 50%; }
+
+.search-divider {
+    width: 1px;
+    height: 30px;
+    background: var(--glass-border);
+    margin: 0 15px 0 10px;
+}
+
+.search-accent {
+    font-size: 1.2rem;
+    color: var(--muted-text);
+}
+
+.spatial-input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    outline: none;
+    color: var(--base-text);
+    font-size: 1.2rem;
+    padding: 0 15px;
+}
+.spatial-input::placeholder { color: var(--muted-text); }
+
+/* 3. Bottom Speed Dial Dock */
+.spatial-dock {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 15px 25px;
+    border-radius: 35px;
+}
+
+.dock-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    overflow: hidden;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    cursor: pointer;
+}
+
+.dock-icon img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.dock-icon:hover {
+    transform: translateY(-10px) scale(1.2);
+    box-shadow: 0 15px 25px rgba(0,0,0,0.4);
+}
+
+/* 4. Spatial Modals */
+.spatial-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.4s ease;
+    background: rgba(0,0,0,0.2);
+}
+
+.spatial-modal.active {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.spatial-sheet {
+    width: 90%;
+    max-width: 450px;
+    max-height: 80vh;
+    padding: 30px;
+    display: flex;
+    flex-direction: column;
+    transform: scale(0.95) translateY(20px);
+    transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.spatial-modal.active .spatial-sheet {
+    transform: scale(1) translateY(0);
+}
+
+.apps-sheet { max-width: 600px; }
+.settings-sheet { max-width: 550px; }
+
+.sheet-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+    border-bottom: 1px solid var(--glass-border);
+    padding-bottom: 15px;
+}
+
+.sheet-title {
+    font-size: 1.4rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.sheet-close {
+    background: transparent;
+    border: none;
+    color: var(--muted-text);
+    font-size: 1.8rem;
+    cursor: pointer;
+    transition: color 0.2s;
+}
+.sheet-close:hover { color: #ff5e5e; }
+
+/* Scrollbars */
+.scroll-hidden {
+    overflow-y: auto;
+    padding-right: 10px;
+}
+.scroll-hidden::-webkit-scrollbar {
+    width: 4px;
+}
+.scroll-hidden::-webkit-scrollbar-track {
+    background: transparent;
+}
+.scroll-hidden::-webkit-scrollbar-thumb {
+    background: var(--glass-border);
+    border-radius: 10px;
+}
+
+/* Links & Lists */
+.data-list { list-style: none; }
+.data-list li {
+    padding: 12px 10px;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.data-list a {
+    color: var(--base-text);
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    font-weight: 500;
+    transition: color 0.2s;
+}
+.data-list a:hover { color: var(--accent-color); }
+
+/* Apps Grid */
+.apps-spatial-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+}
+
+.spatial-app {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 20px;
+    background: rgba(255,255,255,0.03);
+    border-radius: 20px;
+    text-decoration: none;
+    color: var(--base-text);
+    transition: all 0.3s;
+    border: 1px solid transparent;
+}
+
+.spatial-app img {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+}
+
+.spatial-app:hover {
+    background: rgba(255,255,255,0.08);
+    border-color: var(--glass-border);
+    transform: translateY(-5px);
+}
+
+/* Settings Inputs */
+.settings-body {
+    display: flex;
+    flex-direction: column;
+}
+
+.settings-label {
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: 10px;
+    color: var(--muted-text);
+}
+
+.flex-row {
+    display: flex;
+    gap: 10px;
+}
+
+.spatial-input {
+    background: rgba(0,0,0,0.2);
+    border: 1px solid var(--glass-border);
+    border-radius: 12px;
+    padding: 12px;
+    color: var(--base-text);
+    outline: none;
+}
+.spatial-input:focus { border-color: var(--accent-color); }
+.w-40 { width: 40%; }
+.w-60 { width: 60%; }
+.flex-1 { flex: 1; }
+
+.spatial-btn {
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    color: var(--base-text);
+    border-radius: 12px;
+    padding: 0 15px;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.spatial-btn:hover {
+    background: var(--accent-color);
+    border-color: var(--accent-color);
+    color: #fff;
+}
+
+.dials-list {
+    list-style: none;
+    max-height: 250px;
+    overflow-y: auto;
+}
+.dial-config-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    background: rgba(0,0,0,0.1);
+    border-radius: 12px;
+    margin-bottom: 8px;
+}
+
+/* Responsive Constraints */
+@media (max-width: 800px) {
+    .time-display { font-size: 5rem; }
+    .search-stage { width: 90vw; }
+    
+    .spatial-nav-pill {
+        top: auto;
+        bottom: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        flex-direction: row;
+        border-radius: 40px;
+        z-index: 20;
+    }
+    
+    .spatial-dock { bottom: 90px; }
+    
+    .apps-spatial-grid { grid-template-columns: repeat(2, 1fr); }
+}
