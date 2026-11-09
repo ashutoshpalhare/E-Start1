@@ -386,36 +386,68 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (settingsDialList) {
             settingsDialList.replaceChildren();
+            if (!speedDials.length) {
+                const emptyState = document.createElement('li');
+                emptyState.className = 'text-muted';
+                emptyState.textContent = 'No shortcuts yet. Add one above to populate your dock.';
+                settingsDialList.append(emptyState);
+            }
+
             speedDials.forEach((dial, index) => {
                 const safeUrl = parseWebUrl(dial.url);
                 const item = document.createElement('li');
                 item.className = 'dial-config-item';
 
                 const details = document.createElement('div');
-                details.style.cssText = 'display:flex; gap:10px; align-items:center;';
+                details.style.cssText = 'display:flex; gap:10px; align-items:center; min-width:0;';
                 if (safeUrl) details.append(createFavicon(safeUrl.href, ''));
                 const name = document.createElement('span');
                 name.style.fontWeight = '500';
                 name.textContent = dial.name;
+                name.title = dial.name;
                 details.append(name);
+
+                const actions = document.createElement('div');
+                actions.style.cssText = 'display:flex; gap:6px; align-items:center;';
+
+                if (safeUrl) {
+                    const openLink = document.createElement('a');
+                    openLink.href = safeUrl.href;
+                    openLink.target = '_blank';
+                    openLink.rel = 'noopener noreferrer';
+                    openLink.className = 'spatial-btn';
+                    openLink.style.cssText = 'padding:5px 10px; background:transparent;';
+                    openLink.setAttribute('aria-label', `Open ${dial.name} in a new tab`);
+                    const openIcon = document.createElement('i');
+                    openIcon.className = 'bi bi-box-arrow-up-right';
+                    openIcon.setAttribute('aria-hidden', 'true');
+                    openLink.append(openIcon);
+                    actions.append(openLink);
+                }
 
                 const removeButton = document.createElement('button');
                 removeButton.type = 'button';
                 removeButton.className = 'spatial-btn';
-                removeButton.dataset.index = String(index);
                 removeButton.style.cssText = 'padding:5px 10px; background:transparent;';
                 removeButton.setAttribute('aria-label', `Remove ${dial.name}`);
                 const icon = document.createElement('i');
                 icon.className = 'bi bi-trash';
                 icon.style.color = '#ff5e5e';
+                icon.setAttribute('aria-hidden', 'true');
                 removeButton.append(icon);
                 removeButton.addEventListener('click', () => {
-                    speedDials.splice(index, 1);
-                    saveDials();
+                    const [removedDial] = speedDials.splice(index, 1);
+                    if (!saveDials()) {
+                        speedDials.splice(index, 0, removedDial);
+                        showDialFeedback('Could not save this change. Your shortcut was kept.', true);
+                    } else {
+                        showDialFeedback(`Removed ${removedDial.name} from your dock.`);
+                    }
                     renderDials();
                 });
 
-                item.append(details, removeButton);
+                actions.append(removeButton);
+                item.append(details, actions);
                 settingsDialList.append(item);
             });
         }
