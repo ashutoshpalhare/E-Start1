@@ -83,40 +83,57 @@ document.addEventListener('DOMContentLoaded', () => {
     if (engineToggle) {
         engineToggle.addEventListener('click', (e) => {
             e.stopPropagation();
-            engineOptionsBox.classList.toggle('active');
+            if (!engineOptionsBox) return;
+            const isOpen = engineOptionsBox.classList.toggle('active');
+            engineToggle.setAttribute('aria-expanded', String(isOpen));
         });
     }
 
     document.querySelectorAll('.engine-option').forEach(btn => {
         btn.addEventListener('click', (e) => {
             setEngine(e.currentTarget.getAttribute('data-value'));
-            engineOptionsBox.classList.remove('active');
+            engineOptionsBox?.classList.remove('active');
+            engineToggle?.setAttribute('aria-expanded', 'false');
         });
     });
 
     document.addEventListener('click', () => {
-        if (engineOptionsBox && engineOptionsBox.classList.contains('active')) {
+        if (engineOptionsBox?.classList.contains('active')) {
             engineOptionsBox.classList.remove('active');
+            engineToggle?.setAttribute('aria-expanded', 'false');
         }
     });
 
     // --- Main Search Execution Logic ---
     const searchInput = document.getElementById('main-search');
+    const searchUrls = {
+        google: 'https://www.google.com/search?q=',
+        bing: 'https://www.bing.com/search?q=',
+        duckduckgo: 'https://duckduckgo.com/?q=',
+        yahoo: 'https://search.yahoo.com/search?p='
+    };
+
+    function submitSearch() {
+        const query = searchInput?.value.trim();
+        if (!query) {
+            searchInput?.focus();
+            return;
+        }
+        const baseUrl = searchUrls[currentEngine] || searchUrls.google;
+        window.location.assign(`${baseUrl}${encodeURIComponent(query)}`);
+    }
+
     if (searchInput) {
-        searchInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') {
-                const query = searchInput.value.trim();
-                const engine = currentEngine;
-                if (query) {
-                    let searchUrl = '';
-                    if (engine === 'bing') searchUrl = `https://www.bing.com/search?q=${encodeURIComponent(query)}`;
-                    else if (engine === 'duckduckgo') searchUrl = `https://duckduckgo.com/?q=${encodeURIComponent(query)}`;
-                    else if (engine === 'yahoo') searchUrl = `https://search.yahoo.com/search?p=${encodeURIComponent(query)}`;
-                    else searchUrl = `https://www.google.com/search?q=${encodeURIComponent(query)}`;
-                    window.location.href = searchUrl;
-                }
+        searchInput.addEventListener('keydown', (event) => {
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                submitSearch();
             }
         });
+    }
+
+    if (engineOptionsBox) {
+        engineOptionsBox.addEventListener('click', (event) => event.stopPropagation());
     }
 
     // --- Modals Logic ---
