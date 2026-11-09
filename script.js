@@ -136,18 +136,47 @@ document.addEventListener('DOMContentLoaded', () => {
         engineOptionsBox.addEventListener('click', (event) => event.stopPropagation());
     }
 
-    // --- Modals Logic ---
+    // --- Accessible Modals Logic ---
     const modals = document.querySelectorAll('.spatial-modal');
-    document.querySelectorAll('.sheet-close').forEach(btn => {
-        btn.addEventListener('click', () => {
-            modals.forEach(m => m.classList.remove('active'));
+    let previouslyFocusedElement = null;
+
+    function closeModals() {
+        modals.forEach((modal) => {
+            modal.classList.remove('active');
+            modal.setAttribute('aria-hidden', 'true');
+        });
+        if (previouslyFocusedElement?.isConnected) previouslyFocusedElement.focus();
+        previouslyFocusedElement = null;
+    }
+
+    document.querySelectorAll('.sheet-close').forEach((button) => {
+        button.addEventListener('click', closeModals);
+    });
+
+    modals.forEach((modal) => {
+        modal.addEventListener('click', (event) => {
+            if (event.target === modal) closeModals();
         });
     });
 
+    document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape' && document.querySelector('.spatial-modal.active')) {
+            closeModals();
+        }
+    });
+
     function openModal(id) {
-        modals.forEach(m => m.classList.remove('active'));
         const target = document.getElementById(id);
-        if (target) target.classList.add('active');
+        if (!target) return;
+        previouslyFocusedElement = document.activeElement;
+        closeModals();
+        previouslyFocusedElement = document.activeElement === target
+            ? previouslyFocusedElement
+            : previouslyFocusedElement;
+        target.classList.add('active');
+        target.setAttribute('aria-hidden', 'false');
+        const closeButton = target.querySelector('.sheet-close');
+        (closeButton || target).focus();
     }
 
     const histBtn = document.getElementById('history-btn');
