@@ -628,3 +628,51 @@ body {
         bottom: calc(12px + env(safe-area-inset-bottom));
     }
 }
+
+
+/* Phase 4: contain modal scrolling and improve touch targets */
+.spatial-sheet {
+    min-height: 0;
+    overflow: hidden;
+}
+
+.sheet-header {
+    flex: 0 0 auto;
+}
+
+.scroll-hidden,
+.settings-body,
+.apps-spatial-grid {
+    min-height: 0;
+    overscroll-behavior: contain;
+}
+
+.sheet-close,
+.nav-btn,
+.engine-option,
+.spatial-btn {
+    -webkit-tap-highlight-color: transparent;
+}
+
+.sheet-close {
+    min-width: 40px;
+    min-height: 40px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+@media (max-width: 560px) {
+    .spatial-sheet {
+        max-height: min(78svh, 720px);
+    }
+
+    .apps-spatial-grid {
+        gap: 12px;
+    }
+
+    .spatial-app {
+        min-height: 104px;
+        padding: 14px 10px;
+    }
+}
