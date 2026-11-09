@@ -1,23 +1,38 @@
 document.addEventListener('DOMContentLoaded', () => {
 
-    // --- Vanta JS 3D Waves Background Init ---
-    if (typeof VANTA !== 'undefined' && VANTA.WAVES) {
-        VANTA.WAVES({
-            el: "#vanta-bg",
-            mouseControls: true,
-            touchControls: true,
-            gyroControls: false,
-            minHeight: 200.00,
-            minWidth: 200.00,
-            scale: 1.00,
-            scaleMobile: 1.00,
-            color: 0x15182e,
-            shininess: 40.00,
-            waveHeight: 15.00,
-            waveSpeed: 0.80,
-            zoom: 0.8
-        });
+    // --- Optional Vanta background enhancement ---
+    const backgroundElement = document.getElementById('vanta-bg');
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    let vantaEffect = null;
+
+    if (!prefersReducedMotion && backgroundElement && window.VANTA?.WAVES) {
+        try {
+            vantaEffect = window.VANTA.WAVES({
+                el: backgroundElement,
+                mouseControls: true,
+                touchControls: true,
+                gyroControls: false,
+                minHeight: 200,
+                minWidth: 200,
+                scale: 1,
+                scaleMobile: 1,
+                color: 0x15182e,
+                shininess: 40,
+                waveHeight: 15,
+                waveSpeed: 0.8,
+                zoom: 0.8
+            });
+        } catch (error) {
+            console.warn('Animated background could not be initialized; using static background.', error);
+        }
     }
+
+    window.addEventListener('pagehide', () => {
+        if (vantaEffect && typeof vantaEffect.destroy === 'function') {
+            vantaEffect.destroy();
+            vantaEffect = null;
+        }
+    }, { once: true });
 
     // --- Clock, Date and Greeting Logic ---
     const clockElement = document.getElementById('live-clock');
@@ -38,7 +53,7 @@ document.addEventListener('DOMContentLoaded', () => {
         else if (hours24 >= 17 && hours24 < 22) greeting = 'Good Evening';
         else greeting = 'Good Night';
         
-        if (greetingElement) greetingElement.innerHTML = `${greeting}, Mr. Ashutosh.`;
+        if (greetingElement) greetingElement.textContent = `${greeting}, Mr. Ashutosh.`;
         
         hours12 = hours12 < 10 ? '0' + hours12 : hours12;
         minutes = minutes < 10 ? '0' + minutes : minutes;
@@ -140,13 +155,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const modals = document.querySelectorAll('.spatial-modal');
     let previouslyFocusedElement = null;
 
-    function closeModals() {
+    function closeModals(restoreFocus = true) {
         modals.forEach((modal) => {
             modal.classList.remove('active');
             modal.setAttribute('aria-hidden', 'true');
         });
-        if (previouslyFocusedElement?.isConnected) previouslyFocusedElement.focus();
-        previouslyFocusedElement = null;
+        if (restoreFocus && previouslyFocusedElement?.isConnected) previouslyFocusedElement.focus();
+        if (restoreFocus) previouslyFocusedElement = null;
     }
 
     document.querySelectorAll('.sheet-close').forEach((button) => {
@@ -168,11 +183,9 @@ document.addEventListener('DOMContentLoaded', () => {
     function openModal(id) {
         const target = document.getElementById(id);
         if (!target) return;
-        previouslyFocusedElement = document.activeElement;
-        closeModals();
-        previouslyFocusedElement = document.activeElement === target
-            ? previouslyFocusedElement
-            : previouslyFocusedElement;
+        const trigger = document.activeElement;
+        closeModals(false);
+        previouslyFocusedElement = trigger;
         target.classList.add('active');
         target.setAttribute('aria-hidden', 'false');
         const closeButton = target.querySelector('.sheet-close');
