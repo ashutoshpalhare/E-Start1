@@ -91,6 +91,9 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         const domains = { google: 'google.com', bing: 'bing.com', duckduckgo: 'duckduckgo.com', yahoo: 'yahoo.com' };
         if (currentEngineIcon) currentEngineIcon.src = getFaviconUrl(`https://${domains[val]}`);
+        document.querySelectorAll('.engine-option').forEach((option) => {
+            option.setAttribute('aria-pressed', String(option.getAttribute('data-value') === val));
+        });
     }
 
     setEngine(currentEngine);
@@ -149,6 +152,28 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (engineOptionsBox) {
         engineOptionsBox.addEventListener('click', (event) => event.stopPropagation());
+        engineOptionsBox.addEventListener('keydown', (event) => {
+            const options = Array.from(engineOptionsBox.querySelectorAll('.engine-option'));
+            if (!options.length) return;
+
+            const currentIndex = options.indexOf(document.activeElement);
+            let nextIndex = currentIndex;
+            if (event.key === 'ArrowDown') nextIndex = (currentIndex + 1) % options.length;
+            else if (event.key === 'ArrowUp') nextIndex = (currentIndex - 1 + options.length) % options.length;
+            else if (event.key === 'Home') nextIndex = 0;
+            else if (event.key === 'End') nextIndex = options.length - 1;
+            else if (event.key === 'Escape') {
+                engineOptionsBox.classList.remove('active');
+                engineToggle?.setAttribute('aria-expanded', 'false');
+                engineToggle?.focus();
+                return;
+            } else {
+                return;
+            }
+
+            event.preventDefault();
+            options[nextIndex].focus();
+        });
     }
 
     // --- Accessible Modals Logic ---
