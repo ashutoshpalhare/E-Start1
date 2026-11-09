@@ -112,6 +112,7 @@ document.addEventListener('DOMContentLoaded', () => {
             setEngine(e.currentTarget.getAttribute('data-value'));
             engineOptionsBox?.classList.remove('active');
             engineToggle?.setAttribute('aria-expanded', 'false');
+            engineToggle?.focus();
         });
     });
 
@@ -158,8 +159,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const currentIndex = options.indexOf(document.activeElement);
             let nextIndex = currentIndex;
-            if (event.key === 'ArrowDown') nextIndex = (currentIndex + 1) % options.length;
-            else if (event.key === 'ArrowUp') nextIndex = (currentIndex - 1 + options.length) % options.length;
+            if (event.key === 'ArrowDown') nextIndex = currentIndex < 0 ? 0 : (currentIndex + 1) % options.length;
+            else if (event.key === 'ArrowUp') nextIndex = currentIndex < 0 ? options.length - 1 : (currentIndex - 1 + options.length) % options.length;
             else if (event.key === 'Home') nextIndex = 0;
             else if (event.key === 'End') nextIndex = options.length - 1;
             else if (event.key === 'Escape') {
