@@ -422,19 +422,71 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     const addDialBtn = document.getElementById('add-dial-btn');
-    if (addDialBtn) {
-        addDialBtn.addEventListener('click', () => {
-            const name = document.getElementById('dial-name').value.trim();
-            const url = document.getElementById('dial-url').value.trim();
-            if (name && url) {
-                speedDials.push({ name: name, url: url });
-                document.getElementById('dial-name').value = '';
-                document.getElementById('dial-url').value = '';
-                saveDials();
-                renderDials();
+    const dialNameInput = document.getElementById('dial-name');
+    const dialUrlInput = document.getElementById('dial-url');
+    const dialFeedback = document.getElementById('dial-feedback');
+
+    function showDialFeedback(message, isError = false) {
+        if (!dialFeedback) return;
+        dialFeedback.textContent = message;
+        dialFeedback.dataset.state = isError ? 'error' : 'success';
+    }
+
+    function addSpeedDial() {
+        const name = dialNameInput?.value.trim() || '';
+        const rawUrl = dialUrlInput?.value.trim() || '';
+        const safeUrl = parseWebUrl(rawUrl);
+
+        if (!name || !rawUrl) {
+            showDialFeedback('Enter both a shortcut name and URL.', true);
+            return;
+        }
+        if (name.length > 40) {
+            showDialFeedback('Shortcut names must be 40 characters or fewer.', true);
+            return;
+        }
+        if (!safeUrl) {
+            showDialFeedback('Enter a valid HTTP or HTTPS URL.', true);
+            return;
+        }
+        if (speedDials.length >= 30) {
+            showDialFeedback('You have reached the 30-shortcut limit.', true);
+            return;
+        }
+        const duplicate = speedDials.some((dial) => {
+            const existingUrl = parseWebUrl(dial.url);
+            return existingUrl && existingUrl.href.toLowerCase() === safeUrl.href.toLowerCase();
+        });
+        if (duplicate) {
+            showDialFeedback('That URL is already in your shortcuts.', true);
+            return;
+        }
+
+        const newDial = { name, url: safeUrl.href };
+        speedDials.push(newDial);
+        if (!saveDials()) {
+            speedDials.pop();
+            showDialFeedback('Could not save this shortcut. Check your browser storage settings.', true);
+            return;
+        }
+
+        if (dialNameInput) dialNameInput.value = '';
+        if (dialUrlInput) dialUrlInput.value = '';
+        showDialFeedback('Shortcut added to your dock.');
+        renderDials();
+        dialNameInput?.focus();
+    }
+
+    addDialBtn?.addEventListener('click', addSpeedDial);
+    [dialNameInput, dialUrlInput].forEach((input) => {
+        input?.addEventListener('keydown', (event) => {
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                addSpeedDial();
             }
         });
-    }
+        input?.addEventListener('input', () => showDialFeedback(''));
+    });
 
     renderDials();
 
