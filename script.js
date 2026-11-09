@@ -143,17 +143,81 @@ document.addEventListener('DOMContentLoaded', () => {
     if(setBtn) setBtn.addEventListener('click', () => { openModal('modal-settings'); renderDials(); });
     if(appsBtn) appsBtn.addEventListener('click', () => { openModal('modal-apps'); });
 
+    // --- Safe rendering helpers ---
+    function parseWebUrl(value) {
+        try {
+            const url = new URL(value);
+            return ['http:', 'https:'].includes(url.protocol) ? url : null;
+        } catch {
+            return null;
+        }
+    }
+
+    function createFavicon(url, alt = '') {
+        const image = document.createElement('img');
+        image.src = getFaviconUrl(url);
+        image.alt = alt;
+        image.width = 20;
+        image.height = 20;
+        image.loading = 'lazy';
+        image.referrerPolicy = 'no-referrer';
+        image.style.borderRadius = '50%';
+        return image;
+    }
+
+    function createDataListItem({ title, url, time }) {
+        const item = document.createElement('li');
+        const safeUrl = parseWebUrl(url);
+
+        if (safeUrl) {
+            const link = document.createElement('a');
+            link.href = safeUrl.href;
+            link.target = '_blank';
+            link.rel = 'noopener noreferrer';
+            link.append(createFavicon(safeUrl.href));
+            const label = document.createElement('span');
+            label.textContent = title || safeUrl.hostname;
+            link.append(label);
+            item.append(link);
+        } else {
+            item.textContent = title || 'Unavailable item';
+        }
+
+        if (time) {
+            const timestamp = document.createElement('small');
+            timestamp.className = 'text-muted';
+            timestamp.textContent = time;
+            item.append(timestamp);
+        }
+        return item;
+    }
+
     // --- Chrome Extension API Logic ---
     function loadHistory() {
         const list = document.getElementById('history-list');
-        list.innerHTML = '';
-        if (window.chrome && chrome.history && chrome.history.search) {
-            chrome.history.search({text: '', maxResults: 15}, (results) => {
-                results.forEach(page => {
-                    let fav = getFaviconUrl(page.url);
-                    list.innerHTML += `<li><a href="${page.url}" target="_blank"><img src="${fav}" style="width:20px;height:20px;border-radius:50%;"><span>${page.title || page.url}</span></a><small class="text-muted">${new Date(page.lastVisitTime).toLocaleTimeString()}</small></li>`;
+        if (!list) return;
+        list.replaceChildren();
+
+        if (window.chrome?.history?.search) {
+            chrome.history.search({ text: '', maxResults: 15 }, (results = []) => {
+                if (chrome.runtime?.lastError) {
+                    list.textContent = 'Could not load browsing history.';
+                    return;
+                }
+                if (!results.length) {
+                    list.textContent = 'No history entries found.';
+                    return;
+                }
+                results.forEach((page) => {
+                    const time = page.lastVisitTime
+                        ? new Date(page.lastVisitTime).toLocaleTimeString()
+                        : '';
+                    list.append(createDataListItem({
+                        title: page.title,
+                        url: page.url,
+                        time
+                    }));
                 });
-                if(results.length === 0) list.innerHTML = '<li>No history entries found.</li>';
             });
         } else {
             list.textContent = 'Browsing history is available when E-Start runs as a compatible browser extension.';
@@ -162,14 +226,25 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function loadBookmarks() {
         const list = document.getElementById('bookmarks-list');
-        list.innerHTML = '';
-        if (window.chrome && chrome.bookmarks && chrome.bookmarks.getRecent) {
-            chrome.bookmarks.getRecent(15, (results) => {
-                results.forEach(mark => {
-                    let fav = mark.url ? getFaviconUrl(mark.url) : '';
-                    list.innerHTML += `<li><a href="${mark.url}" target="_blank">${fav ? `<img src="${fav}" style="width:20px;height:20px;border-radius:50%;">` : '<i class="bi bi-folder"></i>'}<span>${mark.title || mark.url}</span></a></li>`;
+        if (!list) return;
+        list.replaceChildren();
+
+        if (window.chrome?.bookmarks?.getRecent) {
+            chrome.bookmarks.getRecent(15, (results = []) => {
+                if (chrome.runtime?.lastError) {
+                    list.textContent = 'Could not load bookmarks.';
+                    return;
+                }
+                if (!results.length) {
+                    list.textContent = 'No bookmarks found.';
+                    return;
+                }
+                results.forEach((mark) => {
+                    list.append(createDataListItem({
+                        title: mark.title,
+                        url: mark.url
+                    }));
                 });
-                if(results.length === 0) list.innerHTML = '<li>No bookmarks found.</li>';
             });
         } else {
             list.textContent = 'Bookmarks are available when E-Start runs as a compatible browser extension.';
@@ -235,38 +310,54 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function renderDials() {
         if (dockContainer) {
-            dockContainer.innerHTML = '';
-            speedDials.forEach(dial => {
-                const fav = getFaviconUrl(dial.url);
-                dockContainer.innerHTML += `
-                    <a href="${dial.url}" class="dock-icon" title="${dial.name}">
-                        <img src="${fav}" alt="${dial.name}">
-                    </a>`;
+            dockContainer.replaceChildren();
+            speedDials.forEach((dial) => {
+                const safeUrl = parseWebUrl(dial.url);
+                if (!safeUrl) return;
+
+                const link = document.createElement('a');
+                link.href = safeUrl.href;
+                link.className = 'dock-icon';
+                link.title = dial.name;
+                link.setAttribute('aria-label', dial.name);
+                link.append(createFavicon(safeUrl.href, dial.name));
+                dockContainer.append(link);
             });
         }
-        
+
         if (settingsDialList) {
-            settingsDialList.innerHTML = '';
+            settingsDialList.replaceChildren();
             speedDials.forEach((dial, index) => {
-                const fav = getFaviconUrl(dial.url);
-                settingsDialList.innerHTML += `
-                    <li class="dial-config-item">
-                        <div style="display:flex; gap:10px; align-items:center;">
-                           <img src="${fav}" style="width:24px;height:24px;border-radius:50%;">
-                           <span style="font-weight:500;">${dial.name}</span>
-                        </div>
-                        <button class="spatial-btn" data-index="${index}" style="padding: 5px 10px; background: transparent;"><i class="bi bi-trash" style="color:#ff5e5e;"></i></button>
-                    </li>
-                `;
-            });
-            
-            settingsDialList.querySelectorAll('.spatial-btn').forEach(btn => {
-                btn.addEventListener('click', (e) => {
-                    const idx = e.currentTarget.getAttribute('data-index');
-                    speedDials.splice(idx, 1);
+                const safeUrl = parseWebUrl(dial.url);
+                const item = document.createElement('li');
+                item.className = 'dial-config-item';
+
+                const details = document.createElement('div');
+                details.style.cssText = 'display:flex; gap:10px; align-items:center;';
+                if (safeUrl) details.append(createFavicon(safeUrl.href, ''));
+                const name = document.createElement('span');
+                name.style.fontWeight = '500';
+                name.textContent = dial.name;
+                details.append(name);
+
+                const removeButton = document.createElement('button');
+                removeButton.type = 'button';
+                removeButton.className = 'spatial-btn';
+                removeButton.dataset.index = String(index);
+                removeButton.style.cssText = 'padding:5px 10px; background:transparent;';
+                removeButton.setAttribute('aria-label', `Remove ${dial.name}`);
+                const icon = document.createElement('i');
+                icon.className = 'bi bi-trash';
+                icon.style.color = '#ff5e5e';
+                removeButton.append(icon);
+                removeButton.addEventListener('click', () => {
+                    speedDials.splice(index, 1);
                     saveDials();
                     renderDials();
                 });
+
+                item.append(details, removeButton);
+                settingsDialList.append(item);
             });
         }
     }
