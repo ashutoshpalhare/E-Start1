@@ -599,3 +599,32 @@ body {
     min-width: 2rem;
     min-height: 2rem;
 }
+
+
+/* Phase 4: keep shortcut docks usable with large collections */
+.spatial-dock {
+    max-width: calc(100vw - 32px);
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scrollbar-width: thin;
+    -webkit-overflow-scrolling: touch;
+}
+
+.dock-icon {
+    flex: 0 0 50px;
+}
+
+.spatial-nav-pill {
+    z-index: 30;
+}
+
+@media (max-width: 560px) {
+    .spatial-dock {
+        max-width: calc(100vw - 24px);
+        padding-bottom: calc(12px + env(safe-area-inset-bottom));
+    }
+
+    .spatial-nav-pill {
+        bottom: calc(12px + env(safe-area-inset-bottom));
+    }
+}
