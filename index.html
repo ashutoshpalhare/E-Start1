@@ -59,13 +59,13 @@
       <!-- Morphing Search Bar with Custom Engine Dropdown -->
       <div class="search-stage glass-heavy">
           <!-- Custom Dropdown Container -->
-          <div class="custom-engine-select" id="engine-dropdown-toggle">
+          <button type="button" class="custom-engine-select" id="engine-dropdown-toggle" aria-label="Choose search engine" aria-haspopup="true" aria-expanded="false">
               <img id="current-engine-icon" src="https://s2.googleusercontent.com/s2/favicons?domain_url=https://google.com&sz=64" alt="Google">
               <i class="bi bi-chevron-down ms-2 small text-muted"></i>
-          </div>
+          </button>
           
           <!-- Dropdown Options Box -->
-          <div class="engine-options-box glass-heavy" id="engine-options-box">
+          <div class="engine-options-box glass-heavy" id="engine-options-box" role="group" aria-label="Search engines">
               <button class="engine-option" data-value="google">
                  <img src="https://s2.googleusercontent.com/s2/favicons?domain_url=https://google.com&sz=64" alt="Google"><span>Google</span>
               </button>
