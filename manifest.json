@@ -1,0 +1,13 @@
+{
+  "manifest_version": 3,
+  "name": "E-Start — Spatial New Tab",
+  "version": "2.0.0",
+  "description": "A focused new-tab dashboard with quick links, configurable web search, and optional browser history and bookmarks panels.",
+  "chrome_url_overrides": {
+    "newtab": "index.html"
+  },
+  "permissions": [
+    "history",
+    "bookmarks"
+  ]
+}
