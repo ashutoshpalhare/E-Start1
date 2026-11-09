@@ -559,3 +559,43 @@ body {
         transition-duration: 0.01ms !important;
     }
 }
+
+
+/* Speed dial feedback states */
+#dial-feedback {
+    min-height: 1.25rem;
+    margin: 0.65rem 0 0;
+    font-size: 0.82rem;
+}
+
+#dial-feedback[data-state="error"] {
+    color: #ff8585;
+}
+
+#dial-feedback[data-state="success"] {
+    color: #a9e7c1;
+}
+
+#settings-dial-list .dial-config-item {
+    gap: 0.75rem;
+}
+
+#settings-dial-list .dial-config-item > div:first-child {
+    flex: 1;
+    overflow: hidden;
+}
+
+#settings-dial-list .dial-config-item > div:first-child span {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+#settings-dial-list .spatial-btn,
+#settings-dial-list a.spatial-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 2rem;
+    min-height: 2rem;
+}
