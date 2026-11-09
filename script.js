@@ -176,11 +176,43 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    // --- Safe browser storage helpers ---
+    function readStoredValue(key, fallback = null) {
+        try {
+            const value = localStorage.getItem(key);
+            return value === null ? fallback : value;
+        } catch (error) {
+            console.warn(`Storage read failed for "${key}".`, error);
+            return fallback;
+        }
+    }
+
+    function writeStoredValue(key, value) {
+        try {
+            localStorage.setItem(key, value);
+            return true;
+        } catch (error) {
+            console.warn(`Storage write failed for "${key}".`, error);
+            return false;
+        }
+    }
+
+    function parseStoredJSON(key, fallback) {
+        const rawValue = readStoredValue(key);
+        if (!rawValue) return fallback;
+        try {
+            return JSON.parse(rawValue);
+        } catch (error) {
+            console.warn(`Stored data for "${key}" is invalid; using defaults.`, error);
+            return fallback;
+        }
+    }
+
     // --- Speed Dial Dock Config ---
     const dockContainer = document.getElementById('speed-dial-dock');
     const settingsDialList = document.getElementById('settings-dial-list');
-    
-    let speedDials = JSON.parse(localStorage.getItem('spatial_dials')) || [
+
+    const defaultDials = [
         { name: "Google", url: "https://google.com" },
         { name: "YouTube", url: "https://youtube.com" },
         { name: "Gmail", url: "https://mail.google.com" },
@@ -189,8 +221,16 @@ document.addEventListener('DOMContentLoaded', () => {
         { name: "Netflix", url: "https://netflix.com" }
     ];
 
+    const storedDials = parseStoredJSON('spatial_dials', defaultDials);
+    let speedDials = Array.isArray(storedDials)
+        ? storedDials.filter((dial) =>
+            dial && typeof dial.name === 'string' &&
+            typeof dial.url === 'string' && dial.name.trim() && dial.url.trim()
+        ).slice(0, 30)
+        : defaultDials;
+
     function saveDials() {
-        localStorage.setItem('spatial_dials', JSON.stringify(speedDials));
+        return writeStoredValue('spatial_dials', JSON.stringify(speedDials));
     }
 
     function renderDials() {
