@@ -156,12 +156,13 @@
           
           <div class="settings-body scroll-hidden">
               <h4 class="settings-label mt-0">Manage Dock Dials</h4>
-              <div class="flex-row">
-                  <input type="text" id="dial-name" class="spatial-input w-40" placeholder="Name">
-                  <input type="url" id="dial-url" class="spatial-input w-60" placeholder="URL (https://)">
-                  <button class="spatial-btn" id="add-dial-btn"><i class="bi bi-plus-lg"></i></button>
+              <div class="flex-row" role="group" aria-label="Add a speed dial">
+                  <input type="text" id="dial-name" class="spatial-input w-40" placeholder="Name" aria-label="Shortcut name" maxlength="40" autocomplete="off">
+                  <input type="url" id="dial-url" class="spatial-input w-60" placeholder="URL (https://)" aria-label="Shortcut URL" maxlength="2048" autocomplete="url">
+                  <button type="button" class="spatial-btn" id="add-dial-btn" aria-label="Add shortcut"><i class="bi bi-plus-lg" aria-hidden="true"></i></button>
               </div>
-              <ul class="dials-list mt-3" id="settings-dial-list"></ul>
+              <p id="dial-feedback" class="text-muted" role="status" aria-live="polite"></p>
+              <ul class="dials-list mt-3" id="settings-dial-list" aria-label="Saved shortcuts"></ul>
           </div>
       </div>
   </div>
