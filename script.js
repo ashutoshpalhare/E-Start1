@@ -59,16 +59,23 @@ document.addEventListener('DOMContentLoaded', () => {
     const engineToggle = document.getElementById('engine-dropdown-toggle');
     const engineOptionsBox = document.getElementById('engine-options-box');
     const currentEngineIcon = document.getElementById('current-engine-icon');
-    let currentEngine = localStorage.getItem('spatial_engine') || 'google';
+    const allowedEngines = ['google', 'bing', 'duckduckgo', 'yahoo'];
+    let currentEngine = 'google';
+    try {
+        const storedEngine = localStorage.getItem('spatial_engine');
+        if (allowedEngines.includes(storedEngine)) currentEngine = storedEngine;
+    } catch (error) {
+        console.warn('Search preference storage is unavailable.', error);
+    }
 
     function setEngine(val) {
+        if (!allowedEngines.includes(val)) return;
         currentEngine = val;
-        localStorage.setItem('spatial_engine', val);
-        let domain = "google.com";
-        if (val === 'bing') domain = "bing.com";
-        else if (val === 'duckduckgo') domain = "duckduckgo.com";
-        else if (val === 'yahoo') domain = "yahoo.com";
-        currentEngineIcon.src = getFaviconUrl(`https://${domain}`);
+        try { localStorage.setItem('spatial_engine', val); } catch (error) {
+            console.warn('Could not save search preference.', error);
+        }
+        const domains = { google: 'google.com', bing: 'bing.com', duckduckgo: 'duckduckgo.com', yahoo: 'yahoo.com' };
+        if (currentEngineIcon) currentEngineIcon.src = getFaviconUrl(`https://${domains[val]}`);
     }
 
     setEngine(currentEngine);
@@ -149,9 +156,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 if(results.length === 0) list.innerHTML = '<li>No history entries found.</li>';
             });
         } else {
-            for(let i=1; i<=8; i++) {
-                list.innerHTML += `<li><a href="#"><i class="bi bi-clock-history"></i><span>Mock History Entry ${i}</span></a><small class="text-muted">Just now</small></li>`;
-            }
+            list.textContent = 'Browsing history is available when E-Start runs as a compatible browser extension.';
         }
     }
 
@@ -167,9 +172,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 if(results.length === 0) list.innerHTML = '<li>No bookmarks found.</li>';
             });
         } else {
-            for(let i=1; i<=5; i++) {
-                list.innerHTML += `<li><a href="#"><i class="bi bi-bookmark-fill text-accent"></i><span>Mock Bookmark Entry ${i}</span></a></li>`;
-            }
+            list.textContent = 'Bookmarks are available when E-Start runs as a compatible browser extension.';
         }
     }
 
