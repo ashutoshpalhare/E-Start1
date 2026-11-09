@@ -28,7 +28,9 @@ The repository includes a Manifest V3 manifest for a New Tab override. To test i
 3. Choose **Load unpacked** and select this repository folder.
 4. Open a new tab.
 
-The extension permissions are used only by extension-enabled contexts. Do not assume those APIs exist when running the page as a normal website.
+The manifest requests only the `history` and `bookmarks` permissions. The dashboard's quick links and search work as a normal webpage; history and bookmarks require the extension context and their corresponding permissions.
+
+**Extension packaging note:** this repository currently references Bootstrap Icons, Google Fonts, Three.js, and Vanta.js from public CDNs. Manifest V3 extension pages restrict remotely hosted scripts and styles, so the animated Vanta background and some external presentation assets may be unavailable when loaded unpacked. For a fully self-contained extension release, vendor the required assets locally and verify the extension's Content Security Policy before publishing. The normal static-web experience can continue to use those CDN assets.
 
 ## Project structure
 
@@ -36,6 +38,22 @@ The extension permissions are used only by extension-enabled contexts. Do not as
 - `style.css` — layout, visual system, and responsive behavior
 - `script.js` — clock, search, panels, and speed-dial behavior
 - `manifest.json` — Manifest V3 New Tab configuration
+
+## Final verification checklist
+
+Before publishing a release, verify these flows in a current desktop and mobile browser:
+
+- [ ] Clock and greeting update correctly.
+- [ ] Each search engine submits a non-empty query.
+- [ ] Engine selection works with mouse, Enter, Space, Arrow keys, Home, End, and Escape.
+- [ ] Speed dials accept only HTTP(S) URLs, reject duplicates, and survive a reload.
+- [ ] Invalid or unavailable browser storage does not break the dashboard.
+- [ ] History and bookmarks show a clear explanation outside extension context.
+- [ ] Dialogs close from the close button, backdrop, and Escape; focus returns to the opener.
+- [ ] Reduced-motion preference disables the animated background.
+- [ ] Layout remains usable at narrow mobile widths and with a large shortcut collection.
+
+This checklist is a release guide, not a claim that every browser/device combination has already been manually tested.
 
 ## Privacy
 
