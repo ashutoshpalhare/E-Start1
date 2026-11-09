@@ -3,7 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>New Tab | Spatial</title>
+  <title>E-Start — Spatial New Tab Dashboard</title>
+  <meta name="description" content="A personal spatial start page with a live clock, configurable search, quick links, and workspace shortcuts.">
+  <meta name="theme-color" content="#050510">
   
   <!-- Bootstrap Icons -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
@@ -27,7 +29,7 @@
   <div id="vanta-bg" class="fluid-canvas"></div>
 
   <!-- Left Interaction Pill (Sidebar equivalent) -->
-  <nav class="spatial-nav-pill glass-heavy">
+  <nav class="spatial-nav-pill glass-heavy" aria-label="Dashboard tools">
      <button class="nav-btn" title="Sys.History" id="history-btn">
         <i class="bi bi-clock-history"></i>
      </button>
@@ -43,7 +45,7 @@
   </nav>
 
   <!-- Center Stage -->
-  <main class="center-stage">
+  <main class="center-stage" id="main-content">
       <!-- Huge Clock -->
       <div class="clock-stage">
           <h1 id="live-clock" class="time-display">00:00</h1>
@@ -80,7 +82,7 @@
 
           <div class="search-divider"></div>
           <i class="bi bi-search ms-3 search-accent"></i>
-          <input type="text" id="main-search" class="spatial-input" placeholder="Search the web..." autofocus>
+          <input type="search" id="main-search" class="spatial-input" placeholder="Search the web..." aria-label="Search the web" autocomplete="off" autofocus>
       </div>
   </main>
 
